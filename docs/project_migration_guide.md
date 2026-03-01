@@ -18,7 +18,7 @@
 
 ### ② Antigravity の会話履歴・設定フォルダ（任意ですが推奨）
 Antigravity（AI）が記憶している現在の会話の文脈、作成したレポート（task.mdやproject_report.mdなど）が入っているフォルダです。これを引き継ぐことで、AIに「あの時の続きをお願い」と言うことができます。
-*   **パス**: `C:\Users\nishida\.gemini\antigravity\brain\2444bc14-5d82-4237-9640-4d852c2a641d`
+*   **パス**: `C:\Users\<あなたのユーザー名>\.gemini\antigravity\brain\2444bc14-5d82-4237-9640-4d852c2a641d`
 *   ※ `2444bc14-5d82-4237-9640-4d852c2a641d` はこの特定の会話のIDです。
 
 ---

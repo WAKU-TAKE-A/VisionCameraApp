@@ -18,7 +18,7 @@
       }
     },
     "android": {
-      "package": "com.nishida.visioncameraapp",
+      "package": "com.yourname.visioncameraapp",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
