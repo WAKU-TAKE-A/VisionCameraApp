@@ -12,19 +12,41 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "カメラ機能を使用して画像を撮像します"
+      }
     },
     "android": {
+      "package": "com.nishida.visioncameraapp",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-dev-client",
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "カメラ機能を使用して画像を撮像します",
+          "enableMicrophonePermission": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "08fb1b23-c6eb-4deb-baaf-1efc7681321f"
+      }
     }
   }
 }

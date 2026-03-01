@@ -9,12 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-navigation/native": "^7.1.31",
+    "@react-navigation/native-stack": "^7.14.2",
     "expo": "~55.0.4",
+    "expo-dev-client": "~55.0.10",
+    "expo-file-system": "~55.0.10",
     "expo-status-bar": "~55.0.4",
+    "md5": "^2.3.0",
     "react": "19.2.0",
-    "react-native": "0.83.2"
+    "react-native": "0.83.2",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "react-native-vision-camera": "^4.7.3"
   },
   "devDependencies": {
+    "@types/md5": "^2.3.6",
     "@types/react": "~19.2.2",
     "typescript": "~5.9.2"
   },
