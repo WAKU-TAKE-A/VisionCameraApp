@@ -37,6 +37,11 @@ npm install
 ### 2. アプリのビルド (EAS Build)
 本アプリはカメラ機能などのネイティブモジュールを利用するため、標準の Expo Go では動作しません。EAS (Expo Application Services) を用いた Development Build （開発用クライアント）を作成します。
 
+ビルドのために、まず EAS CLI をグローバルにインストールします。
+```bash
+npm install -g eas-cli
+```
+
 ```bash
 # EAS CLI にログイン
 eas login
@@ -53,7 +58,7 @@ cd mock_server
 pip install flask werkzeug
 python mock_server.py
 ```
-*(起動するとポート `31000` で待ち受けを開始します。)*
+*(起動するとポート `2880` で待ち受けを開始します。)*
 
 ### 4. 開発サーバー (Metro) の起動
 ルートディレクトリに戻り、Expo開発サーバーを起動します。

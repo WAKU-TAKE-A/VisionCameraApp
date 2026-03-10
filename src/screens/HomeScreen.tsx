@@ -30,6 +30,10 @@ export default function HomeScreen({ navigation }: Props) {
         navigation.navigate('Camera');
     };
 
+    const handleSettings = () => {
+        navigation.navigate('Settings');
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Vision Camera App</Text>
@@ -37,9 +41,14 @@ export default function HomeScreen({ navigation }: Props) {
             {isInitializing ? (
                 <Text>初期化中...</Text>
             ) : (
-                <TouchableOpacity style={styles.button} onPress={handleStart}>
-                    <Text style={styles.buttonText}>実行</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={handleStart}>
+                        <Text style={styles.buttonText}>実行</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, styles.settingsButton]} onPress={handleSettings}>
+                        <Text style={styles.buttonText}>設定</Text>
+                    </TouchableOpacity>
+                </View>
             )}
         </View>
     );
@@ -57,11 +66,21 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 40,
     },
+    buttonContainer: {
+        alignItems: 'center',
+        width: '100%',
+    },
     button: {
         backgroundColor: '#007AFF',
         paddingVertical: 15,
         paddingHorizontal: 40,
         borderRadius: 8,
+        width: 200,
+        alignItems: 'center',
+    },
+    settingsButton: {
+        backgroundColor: '#8E8E93',
+        marginTop: 15,
     },
     buttonText: {
         color: '#fff',

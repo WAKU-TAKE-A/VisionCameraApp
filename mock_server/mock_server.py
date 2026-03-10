@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_file
-from flask_httpauth import HTTPDigestAuth
+#from flask_httpauth import HTTPDigestAuth
 import os
 import time
 import threading
@@ -41,7 +41,8 @@ def check_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-UPLOAD_DIR = 'uploads'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # グローバル状態で現在の処理状況を管理（簡易実装）
@@ -107,6 +108,6 @@ def get_result_image():
     return "No image available", 404
 
 if __name__ == '__main__':
-    print("サーバーをポート 31000 で起動します...")
-    app.run(host='0.0.0.0', port=31000, 
+    print("サーバーをポート 2880 で起動します...")
+    app.run(host='0.0.0.0', port=2880, 
             debug=False) # Digest認証とThreadingの兼ね合いでdebugはFalse推奨

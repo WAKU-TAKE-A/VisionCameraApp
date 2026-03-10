@@ -36,7 +36,8 @@ export default function CameraScreen({ navigation }: Props) {
             const config = await loadConfig();
 
             // Upload
-            const uploadSuccess = await uploadImageWithDigest('file://' + photo.path, config);
+            const imageUri = photo.path.startsWith('file://') ? photo.path : 'file://' + photo.path;
+            const uploadSuccess = await uploadImageWithDigest(imageUri, config);
             if (!uploadSuccess) {
                 throw new Error('画像のアップロードに失敗しました (認証エラーまたはネットワークエラー)');
             }

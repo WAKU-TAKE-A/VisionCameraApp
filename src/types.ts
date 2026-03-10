@@ -7,4 +7,5 @@ export type RootStackParamList = {
         imageUri?: string;
         errorMessage?: string;
     };
+    Settings: undefined;
 };

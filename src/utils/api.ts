@@ -159,7 +159,8 @@ export async function fetchResults(config: AppConfig): Promise<{ resultData: any
         const dataRes = await fetchWithAuth(resultUrl, '/result');
         const resultData = await dataRes.json();
 
-        const imageFileUri = FileSystem.documentDirectory + 'result_image.jpg';
+        const timestamp = Date.now();
+        const imageFileUri = FileSystem.documentDirectory + `result_image_${timestamp}.jpg`;
         let downloadedImageUri = '';
 
         const imgInitRes = await fetch(resultImageUrl);

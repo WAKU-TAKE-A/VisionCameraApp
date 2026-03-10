@@ -20,7 +20,7 @@ export default function ResultScreen({ navigation, route }: Props) {
             {isSuccess ? (
                 <>
                     <Text style={styles.title}>結果: 完了</Text>
-                    {imageUri && <Image source={{ uri: 'file://' + imageUri }} style={styles.image} />}
+                    {imageUri && <Image source={{ uri: imageUri.startsWith('file://') ? imageUri : 'file://' + imageUri }} style={styles.image} />}
                     <Text style={styles.info}>取得データ: {JSON.stringify(resultData)}</Text>
                 </>
             ) : (

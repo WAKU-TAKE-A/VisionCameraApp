@@ -5,6 +5,7 @@ import { RootStackParamList } from './src/types';
 import HomeScreen from './src/screens/HomeScreen';
 import CameraScreen from './src/screens/CameraScreen';
 import ResultScreen from './src/screens/ResultScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -15,6 +16,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: '初期画面' }} />
         <Stack.Screen name="Camera" component={CameraScreen} options={{ title: 'カメラ' }} />
         <Stack.Screen name="Result" component={ResultScreen} options={{ title: '結果' }} />
+        <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: '設定' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

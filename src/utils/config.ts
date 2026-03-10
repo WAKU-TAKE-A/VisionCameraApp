@@ -12,8 +12,8 @@ export interface AppConfig {
 const CONFIG_FILE_URI = documentDirectory + 'config.json';
 
 const DEFAULT_CONFIG: AppConfig = {
-    serverUrl: 'http://192.168.0.121',
-    serverPort: 31000,
+    serverUrl: 'http://10.26.57.202',
+    serverPort: 2880,
     username: 'admin',
     password: 'password',
     pollIntervalMs: 1000,
@@ -28,4 +28,8 @@ export async function loadConfig(): Promise<AppConfig> {
     await initConfigIfNeeded();
     const content = await readAsStringAsync(CONFIG_FILE_URI);
     return JSON.parse(content) as AppConfig;
+}
+
+export async function saveConfig(config: AppConfig): Promise<void> {
+    await writeAsStringAsync(CONFIG_FILE_URI, JSON.stringify(config, null, 2));
 }
