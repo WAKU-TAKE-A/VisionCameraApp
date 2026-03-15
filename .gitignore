@@ -40,3 +40,4 @@ yarn-error.*
 /ios
 /android
 /mock_server/uploads/captured_image.jpg
+/mock_server/__pycache__/*.pyc
