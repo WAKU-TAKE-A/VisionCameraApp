@@ -4,7 +4,13 @@ import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { loadConfig } from '../utils/config';
-import { uploadImageWithDigest, pollCheckEndpoint, fetchResults } from '../utils/api';
+import { 
+    checkUploadStatus, 
+    uploadImageWithDigest, 
+    executeVisionEdition, 
+    pollVisionEditionStatus, 
+    fetchVisionEditionResult 
+} from '../utils/api';
 
 type CameraScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Camera'>;
 
@@ -35,21 +41,54 @@ export default function CameraScreen({ navigation }: Props) {
 
             const config = await loadConfig();
 
-            // Upload
-            const imageUri = photo.path.startsWith('file://') ? photo.path : 'file://' + photo.path;
-            const uploadSuccess = await uploadImageWithDigest(imageUri, config);
-            if (!uploadSuccess) {
-                throw new Error('画像のアップロードに失敗しました (認証エラーまたはネットワークエラー)');
+            // 1. Wait until upload server is ready
+            try {
+                await checkUploadStatus(config);
+            } catch (e: any) {
+                throw new Error(`手順1(アップロード準備確認)失敗: ${e.message}`);
             }
 
-            // Poll
-            await pollCheckEndpoint(config);
+            // 2. Upload image to our own upload server
+            let uploadSuccess = false;
+            try {
+                const imageUri = photo.path.startsWith('file://') ? photo.path : 'file://' + photo.path;
+                uploadSuccess = await uploadImageWithDigest(imageUri, config);
+            } catch (e: any) {
+                throw new Error(`手順2(画像アップロード)失敗: ${e.message}`);
+            }
+            if (!uploadSuccess) {
+                throw new Error('手順2(画像アップロード)失敗: 認証エラーまたはネットワークエラー');
+            }
 
-            // Fetch result
-            const results = await fetchResults(config);
+            // 3. Execute Vision Edition Job and get trigger time
+            let triggerTime = '';
+            try {
+                triggerTime = await executeVisionEdition(config);
+            } catch (e: any) {
+                throw new Error(`手順3(VE実行トリガー)失敗: ${e.message}`);
+            }
+
+            // 4. Wait for Vision Edition to finish processing
+            try {
+                await pollVisionEditionStatus(config);
+            } catch (e: any) {
+                throw new Error(`手順4(VE処理完了待機)失敗: ${e.message}`);
+            }
+
+            // 5. Fetch the result image from Vision Edition
+            let downloadedImageUri = '';
+            try {
+                downloadedImageUri = await fetchVisionEditionResult(config, triggerTime);
+            } catch (e: any) {
+                throw new Error(`手順5(VE結果画像取得)失敗: ${e.message}`);
+            }
 
             setIsProcessing(false);
-            navigation.navigate('Result', { imageUri: results.imageUri, resultData: results.resultData, isSuccess: true });
+            navigation.navigate('Result', { 
+                imageUri: downloadedImageUri, 
+                resultData: { triggerTime, message: 'Vision Edition 処理完了' }, 
+                isSuccess: true 
+            });
         } catch (e: any) {
             console.error(e);
             setIsProcessing(false);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { loadConfig, initConfigIfNeeded } from '../utils/config';
+import { loadConfig } from '../utils/config';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -16,7 +16,7 @@ export default function HomeScreen({ navigation }: Props) {
     useEffect(() => {
         const setup = async () => {
             try {
-                await initConfigIfNeeded();
+                await loadConfig(); // This now initializes and merges the config
                 setIsInitializing(false);
             } catch (e: any) {
                 console.error('Config init error:', e);

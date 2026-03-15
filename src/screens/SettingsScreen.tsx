@@ -13,7 +13,11 @@ interface Props {
 export default function SettingsScreen({ navigation }: Props) {
     const [config, setConfig] = useState<AppConfig | null>(null);
     const [serverUrl, setServerUrl] = useState('');
-    const [serverPort, setServerPort] = useState('');
+    const [uploadPort, setUploadPort] = useState('');
+    const [vePort, setVePort] = useState('');
+    const [jobNumber, setJobNumber] = useState('');
+    const [triggerNumber, setTriggerNumber] = useState('');
+    const [timeoutSecs, setTimeoutSecs] = useState('');
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -21,7 +25,11 @@ export default function SettingsScreen({ navigation }: Props) {
                 const conf = await loadConfig();
                 setConfig(conf);
                 setServerUrl(conf.serverUrl);
-                setServerPort(conf.serverPort.toString());
+                setUploadPort(conf.uploadPort.toString());
+                setVePort(conf.vePort.toString());
+                setJobNumber(conf.jobNumber.toString());
+                setTriggerNumber(conf.triggerNumber.toString());
+                setTimeoutSecs(conf.timeoutSecs.toString());
             } catch (e: any) {
                 Alert.alert('エラー', '設定の読み込みに失敗しました');
             }
@@ -32,13 +40,26 @@ export default function SettingsScreen({ navigation }: Props) {
     const handleSave = async () => {
         if (!config) return;
 
-        const portNum = parseInt(serverPort, 10);
-        if (isNaN(portNum) || portNum <= 0 || portNum > 65535) {
-            Alert.alert('エラー', '有効なポート番号を入力してください');
+        const uploadPortNum = parseInt(uploadPort, 10);
+        const vePortNum = parseInt(vePort, 10);
+        const jobNum = parseInt(jobNumber, 10);
+        const triggerNum = parseInt(triggerNumber, 10);
+        const timeoutNum = parseInt(timeoutSecs, 10);
+
+        if ([uploadPortNum, vePortNum, jobNum, triggerNum, timeoutNum].some(n => isNaN(n) || n <= 0)) {
+            Alert.alert('エラー', '有効な数値を入力してください');
             return;
         }
 
-        const newConfig = { ...config, serverUrl, serverPort: portNum };
+        const newConfig = { 
+            ...config, 
+            serverUrl, 
+            uploadPort: uploadPortNum,
+            vePort: vePortNum,
+            jobNumber: jobNum,
+            triggerNumber: triggerNum,
+            timeoutSecs: timeoutNum
+        };
         try {
             await saveConfig(newConfig);
             Alert.alert('成功', '設定を保存しました', [
@@ -72,11 +93,43 @@ export default function SettingsScreen({ navigation }: Props) {
                     autoCapitalize="none"
                 />
 
-                <Text style={styles.label}>ポート番号 (例: 2880)</Text>
+                <Text style={styles.label}>アップロード用ポート番号 (例: 2880)</Text>
                 <TextInput
                     style={styles.input}
-                    value={serverPort}
-                    onChangeText={setServerPort}
+                    value={uploadPort}
+                    onChangeText={setUploadPort}
+                    keyboardType="numeric"
+                />
+
+                <Text style={styles.label}>Vision Edition用ポート番号 (例: 31000)</Text>
+                <TextInput
+                    style={styles.input}
+                    value={vePort}
+                    onChangeText={setVePort}
+                    keyboardType="numeric"
+                />
+
+                <Text style={styles.label}>ジョブ番号 (例: 1)</Text>
+                <TextInput
+                    style={styles.input}
+                    value={jobNumber}
+                    onChangeText={setJobNumber}
+                    keyboardType="numeric"
+                />
+
+                <Text style={styles.label}>トリガー番号 (例: 1)</Text>
+                <TextInput
+                    style={styles.input}
+                    value={triggerNumber}
+                    onChangeText={setTriggerNumber}
+                    keyboardType="numeric"
+                />
+
+                <Text style={styles.label}>タイムアウト[秒] (例: 300)</Text>
+                <TextInput
+                    style={styles.input}
+                    value={timeoutSecs}
+                    onChangeText={setTimeoutSecs}
                     keyboardType="numeric"
                 />
 
