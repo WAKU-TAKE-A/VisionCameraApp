@@ -59,13 +59,19 @@ function getVeUrl(config: AppConfig, path: string): string {
 }
 
 async function fetchWithOptionalDigest(url: string, method: string, path: string, config: AppConfig) {
-    const initRes = await fetch(url, { method });
+    const initRes = await fetch(url, { 
+        method,
+        headers: { 'Connection': 'close' }
+    });
     if (initRes.status === 401) {
         const authHdr = initRes.headers.get('WWW-Authenticate');
         if (authHdr && authHdr.toLowerCase().startsWith('digest')) {
             return fetch(url, {
                 method,
-                headers: { Authorization: buildDigestAuthHeader(method, path, authHdr, config) }
+                headers: { 
+                    'Authorization': buildDigestAuthHeader(method, path, authHdr, config),
+                    'Connection': 'close'
+                }
             });
         }
     }
@@ -203,14 +209,23 @@ export async function fetchVisionEditionResult(config: AppConfig, triggerTime: s
 
     try {
         // Try initial download. If it returns 401, we can read headers from the result.
-        let dlRes = await FileSystem.downloadAsync(resultUrl, imageFileUri);
-        
+        let dlRes = await FileSystem.downloadAsync(resultUrl, imageFileUri, {
+            headers: { 
+                'Connection': 'close',
+                'Accept': '*/*'
+            }
+        });
+
         if (dlRes.status === 401) {
             const authHdr = dlRes.headers['www-authenticate'] || dlRes.headers['WWW-Authenticate'];
             if (authHdr && authHdr.toLowerCase().startsWith('digest')) {
                 const auth = buildDigestAuthHeader('GET', resultPath, authHdr, config);
                 dlRes = await FileSystem.downloadAsync(resultUrl, imageFileUri, {
-                    headers: { 'Authorization': auth }
+                    headers: { 
+                        'Authorization': auth,
+                        'Connection': 'close',
+                        'Accept': '*/*'
+                    }
                 });
             }
         }

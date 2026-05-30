@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
@@ -21,6 +21,7 @@ interface Props {
 export default function CameraScreen({ navigation }: Props) {
     const [hasPermission, setHasPermission] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [previewUri, setPreviewUri] = useState<string | null>(null);
     const device = useCameraDevice('back');
     const camera = useRef<Camera>(null);
 
@@ -34,11 +35,21 @@ export default function CameraScreen({ navigation }: Props) {
     const handleCapture = async () => {
         if (!camera.current || isProcessing) return;
         try {
-            setIsProcessing(true);
             const photo = await camera.current.takePhoto({
                 flash: 'auto'
             });
+            const imageUri = photo.path.startsWith('file://') ? photo.path : 'file://' + photo.path;
+            setPreviewUri(imageUri);
+        } catch (e: any) {
+            console.error('Capture error', e);
+            Alert.alert('エラー', '画像の撮影に失敗しました');
+        }
+    };
 
+    const handleExecute = async () => {
+        if (!previewUri || isProcessing) return;
+        try {
+            setIsProcessing(true);
             const config = await loadConfig();
 
             // 1. Wait until upload server is ready
@@ -51,8 +62,7 @@ export default function CameraScreen({ navigation }: Props) {
             // 2. Upload image to our own upload server
             let uploadSuccess = false;
             try {
-                const imageUri = photo.path.startsWith('file://') ? photo.path : 'file://' + photo.path;
-                uploadSuccess = await uploadImageWithDigest(imageUri, config);
+                uploadSuccess = await uploadImageWithDigest(previewUri, config);
             } catch (e: any) {
                 throw new Error(`手順2(画像アップロード)失敗: ${e.message}`);
             }
@@ -84,6 +94,7 @@ export default function CameraScreen({ navigation }: Props) {
             }
 
             setIsProcessing(false);
+            setPreviewUri(null); // Reset preview for next time
             navigation.navigate('Result', { 
                 imageUri: downloadedImageUri, 
                 resultData: { triggerTime, message: 'Vision Edition 処理完了' }, 
@@ -92,6 +103,7 @@ export default function CameraScreen({ navigation }: Props) {
         } catch (e: any) {
             console.error(e);
             setIsProcessing(false);
+            setPreviewUri(null); // Reset preview
             navigation.navigate('Result', {
                 imageUri: undefined,
                 resultData: null,
@@ -99,6 +111,10 @@ export default function CameraScreen({ navigation }: Props) {
                 errorMessage: e.message || '処理中にエラーが発生しました'
             });
         }
+    };
+
+    const handleRetake = () => {
+        setPreviewUri(null);
     };
 
     if (!hasPermission) return <Text style={{ flex: 1, textAlign: 'center', marginTop: 50 }}>カメラの権限がありません</Text>;
@@ -121,12 +137,30 @@ export default function CameraScreen({ navigation }: Props) {
                 </View>
             )}
 
-            {!isProcessing && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
-                        <Text style={styles.buttonText}>撮像</Text>
-                    </TouchableOpacity>
-                </View>
+            {previewUri ? (
+                <>
+                    <Image source={{ uri: previewUri }} style={StyleSheet.absoluteFill} />
+                    {!isProcessing && (
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={[styles.captureButton, { backgroundColor: '#FF3B30' }]} onPress={handleRetake}>
+                                <Text style={styles.buttonText}>撮り直す</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.captureButton, { backgroundColor: '#34C759' }]} onPress={handleExecute}>
+                                <Text style={styles.buttonText}>実行する</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </>
+            ) : (
+                <>
+                    {!isProcessing && (
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
+                                <Text style={styles.buttonText}>撮像</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </>
             )}
         </View>
     );
